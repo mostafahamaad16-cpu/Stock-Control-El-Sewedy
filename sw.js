@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inventory-app-v6'; 
+const CACHE_NAME = 'inventory-app-v7'; 
 
 const urlsToCache = [
     './',
@@ -36,13 +36,13 @@ self.addEventListener('fetch', event => {
                 const file = formData.get('sharedFile');
                 if (file) {
                     const cache = await caches.open(CACHE_NAME);
-                    // حفظ الملف باسم نسبي بدون /
+                    // حفظ الملف باسم
                     await cache.put('shared-excel-file', new Response(file));
                 }
-                // التوجيه النسبي للمجلد الحالي (هذا هو السطر الذي يحل مشكلة جيت هاب)
-                return Response.redirect('./?shared=1', 303);
+                // التوجيه الصحيح لمسار مشروعك على جيت هاب (الحل النهائي)
+                return Response.redirect('/Stock-Control-El-Sewedy/?shared=1', 303);
             } catch (err) {
-                return Response.redirect('./', 303);
+                return Response.redirect('/Stock-Control-El-Sewedy/', 303);
             }
         })());
         return;
