@@ -83,6 +83,8 @@
 
 <body class="text-gray-800 flex flex-col min-h-screen">
 
+    <div id="onlineStatus" class="fixed top-0 left-0 right-0 text-center text-xs font-bold py-2 z-[110] transition-all hidden"></div>
+
     <div id="authOverlay">
         <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl border border-gray-200">
             <div class="text-center mb-6">
@@ -111,7 +113,7 @@
                         <label for="rememberMe" class="text-sm font-bold text-gray-600">تذكر تسجيل الدخول</label>
                     </div>
 
-                    <button onclick="handleLogin()"
+                    <button id="loginBtn" onclick="handleLogin()"
                         class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition mt-4 text-lg">دخول</button>
                 </div>
                 <p class="text-sm text-center text-gray-600 mt-4">ليس لديك حساب؟ <button
@@ -140,7 +142,7 @@
                             dir="ltr">
                     </div>
 
-                    <button onclick="handleRegister()"
+                    <button id="regBtn" onclick="handleRegister()"
                         class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow hover:bg-green-700 transition mt-4 text-lg">تسجيل
                         الحساب</button>
                 </div>
@@ -388,6 +390,30 @@
     </div>
 
     <script>
+        // --- تهيئة ومراقبة حالة الإنترنت ---
+        let isOnline = navigator.onLine;
+
+        function updateOnlineStatus() {
+            isOnline = navigator.onLine;
+            const statusEl = document.getElementById('onlineStatus');
+            const loginBtn = document.getElementById('loginBtn');
+            const regBtn = document.getElementById('regBtn');
+
+            if (isOnline) {
+                statusEl.classList.add('hidden');
+                if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = "1"; }
+                if (regBtn) { regBtn.disabled = false; regBtn.style.opacity = "1"; }
+            } else {
+                statusEl.innerText = "أوفلاين - يرجى الاتصال بالإنترنت لتسجيل الدخول أو إنشاء حساب";
+                statusEl.className = "fixed top-0 left-0 right-0 text-center text-xs font-bold py-2 z-[110] transition-all bg-red-500 text-white";
+                if (loginBtn) { loginBtn.disabled = true; loginBtn.style.opacity = "0.5"; }
+                if (regBtn) { regBtn.disabled = true; regBtn.style.opacity = "0.5"; }
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
         // --- تسجيل Service Worker لتفعيل التثبيت والعمل أوفلاين ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -400,30 +426,23 @@
         const installAppBtn = document.getElementById('installAppBtn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            // منع المتصفح من إظهار الإشعار التلقائي المزعج
             e.preventDefault();
-            // حفظ الحدث لاستخدامه عند الضغط على الزر
             deferredPrompt = e;
-            // إظهار زر التثبيت الخاص بنا
             installAppBtn.classList.remove('hidden');
         });
 
         installAppBtn.addEventListener('click', async () => {
             if (deferredPrompt !== null) {
-                // إظهار نافذة التثبيت الرسمية من المتصفح
                 deferredPrompt.prompt();
-                // انتظار رد المستخدم (موافق أم إلغاء)
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     console.log('تمت الموافقة على التثبيت');
-                    // إخفاء الزر بعد التثبيت
                     installAppBtn.classList.add('hidden');
                 }
                 deferredPrompt = null;
             }
         });
 
-        // إخفاء الزر إذا تم تثبيت التطبيق بنجاح
         window.addEventListener('appinstalled', () => {
             installAppBtn.classList.add('hidden');
             deferredPrompt = null;
@@ -442,6 +461,7 @@
         let calcCurrentValue = 0;
 
         window.onload = () => {
+            updateOnlineStatus(); // فحص الإنترنت عند التحميل
             checkAuth();
         }
 
@@ -481,14 +501,16 @@
         }
 
         function handleRegister() {
+            if (!isOnline) return alert("يجب أن تكون متصلاً بالإنترنت لإنشاء حساب.");
+
             const name = document.getElementById('regName').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const password = document.getElementById('regPassword').value;
 
             if (!name || !phone || !password) return alert("يرجى إدخال الاسم، رقم الموبايل، وكلمة المرور.");
 
-            // ======= التعديل الأمني هنا: ضع رقمك الحقيقي =======
-            const ADMIN_PHONE = "01009752219"; // استبدل هذا الرقم برقمك
+            // ======= التعديل الأمني هنا =======
+            const ADMIN_PHONE = "01009752219";
 
             let existingUser = usersDB.find(u => u.phone === phone);
 
@@ -512,12 +534,11 @@
             if (isThisUserAdmin) {
                 alert("مرحباً بك يا مصطفى! تم التحقق من هويتك كمدير للنظام.");
                 currentUser = newUser;
-                saveSession(true); // تذكر المدير تلقائياً عند أول إنشاء للحساب
+                saveSession(true); 
                 checkAuth();
             } else {
                 alert("تم إنشاء الحساب بنجاح. يرجى انتظار تفعيل المدير لحسابك لتتمكن من الدخول.");
-                toggleAuthMode('login'); // العودة لصفحة الدخول
-                // مسح الحقول ونقل الرقم لصفحة الدخول للتسهيل
+                toggleAuthMode('login');
                 document.getElementById('regName').value = '';
                 document.getElementById('regPhone').value = '';
                 document.getElementById('regPassword').value = '';
@@ -526,6 +547,8 @@
         }
 
         function handleLogin() {
+            if (!isOnline) return alert("يجب أن تكون متصلاً بالإنترنت لتسجيل الدخول.");
+
             const phone = document.getElementById('loginPhone').value.trim();
             const password = document.getElementById('loginPassword').value;
             const rememberMe = document.getElementById('rememberMe').checked;
