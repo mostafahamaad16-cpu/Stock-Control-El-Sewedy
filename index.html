@@ -437,26 +437,33 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('shared') === '1') {
                 try {
-                    // فتح إصدار الكاش الجديد v6
-                    const cache = await caches.open('inventory-app-v6'); 
-                    // جلب الملف بدون علامة /
-                    const response = await cache.match('shared-excel-file');
+                    // فتح الصندوق المخصص للملفات
+                    const cache = await caches.open('shared-file-cache'); 
+                    const response = await cache.match('/shared-excel');
+                    
                     if (response) {
                         const blob = await response.blob();
-                        const file = new File([blob], "shared-file.xlsx", { type: blob.type });
-                        await cache.delete('shared-excel-file');
+                        // إجبار النظام على قراءته كملف إكسيل في حالة أرسله الواتساب بصيغة مجهولة
+                        const file = new File([blob], "shared-file.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
                         
-                        // تنظيف الرابط مع الحفاظ على مسار المشروع
+                        // مسح الملف بعد استلامه
+                        await cache.delete('/shared-excel');
+                        
+                        // تنظيف الرابط
                         window.history.replaceState({}, document.title, window.location.pathname);
                         
-                        if (confirm("تم استلام شيت إكسيل جديد عبر المشاركة. هل تريد استيراده الآن لتحديث بيانات الجرد؟")) {
+                        if (confirm("تم استلام شيت إكسيل جديد. هل تريد استيراده الآن لتحديث بيانات الجرد؟")) {
                             switchTab('importTab');
                             processExcelFile(file);
                         }
+                    } else {
+                        console.log("لم يتم العثور على الملف في الكاش المؤقت.");
                     }
-                } catch(e) { console.log("خطأ في قراءة الملف المشترك:", e); }
+                } catch(e) { 
+                    console.log("خطأ في قراءة الملف المشترك:", e); 
+                }
             }
-        }
+
         function clearAllData() {
             if (confirm("هل أنت متأكد من مسح كافة البيانات والجلسات من هذا الجهاز بشكل نهائي؟")) {
                 localStorage.removeItem('inventory_items'); localStorage.removeItem('inventory_sessions');
