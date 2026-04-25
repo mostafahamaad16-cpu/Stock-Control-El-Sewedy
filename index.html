@@ -142,12 +142,19 @@
                     <button onclick="importExcel()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition">بدء الاستيراد وتحديث البيانات</button>
                 </div>
 
-                <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-200">
+                <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-200 mb-4">
                     <span class="font-bold">إجمالي الأصناف المسجلة:</span>
                     <span id="totalItemsBadge" class="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-lg">0</span>
                 </div>
 
-                <button onclick="clearAllData()" class="mt-8 w-full bg-red-100 text-red-700 border border-red-300 py-3 rounded-lg font-bold">مسح كافة البيانات من هذا الجهاز</button>
+                <div class="bg-orange-50 p-5 rounded-xl shadow-sm border border-orange-200 mb-4">
+                    <h3 class="font-bold mb-2 text-orange-700">حذف بيانات ماركة محددة</h3>
+                    <p class="text-xs text-orange-600 mb-3">سيتم حذف الأصناف وتقارير الجرد الخاصة بهذه الماركة فقط.</p>
+                    <select id="deleteBrandSelect" class="w-full border-2 border-orange-300 rounded-lg p-3 outline-none focus:border-orange-500 mb-3 bg-white"></select>
+                    <button onclick="deleteBrandData()" class="w-full bg-orange-500 text-white py-2 rounded-lg font-bold shadow hover:bg-orange-600 transition">حذف الماركة المحددة</button>
+                </div>
+
+                <button onclick="clearAllData()" class="mt-4 w-full bg-red-100 text-red-700 border border-red-300 py-3 rounded-lg font-bold">مسح كافة البيانات من هذا الجهاز</button>
             </div>
 
             <div id="inventoryTab" class="tab-content">
@@ -297,7 +304,6 @@
         let calcTargetItemCode = null;
         let calcCurrentValue = 0;
 
-        // متغيرات التسجيل المؤقتة
         let tempRegData = null;
         let tempRequestCode = null;
 
@@ -341,7 +347,6 @@
             if (!name || !phone || !password) return alert("يرجى إدخال جميع البيانات.");
             if (usersDB.find(u => u.phone === phone)) return alert("الرقم مسجل بالفعل على هذا الجهاز. يرجى تسجيل الدخول.");
 
-            // توليد كود طلب عشوائي من 4 أرقام
             tempRequestCode = Math.floor(1000 + Math.random() * 9000);
             tempRegData = { phone, name, password };
 
@@ -353,11 +358,9 @@
             const inputKey = document.getElementById('activationKeyInput').value.trim();
             if (!inputKey) return alert("يرجى إدخال مفتاح التفعيل.");
 
-            // المعادلة السرية: (كود الطلب * 13) + 79
             const correctKey = (tempRequestCode * 13) + 79;
 
             if (parseInt(inputKey) === correctKey) {
-                // تفعيل ناجح
                 usersDB.push(tempRegData);
                 localStorage.setItem('inventory_users', JSON.stringify(usersDB));
                 
@@ -366,7 +369,6 @@
                 saveSession(true);
                 checkAuth();
                 
-                // تنظيف المتغيرات المؤقتة
                 tempRegData = null;
                 tempRequestCode = null;
                 document.getElementById('activationKeyInput').value = '';
@@ -410,7 +412,7 @@
             checkAuth();
         }
 
-        // --- باقي دوال التطبيق ---
+        // --- دوال التطبيق ---
         function autoSaveSession() {
             if (!currentSession) return;
             const existingIndex = sessionsDB.findIndex(s => s.id === currentSession.id);
@@ -432,11 +434,15 @@
                     }
                 }
             });
+            if (tabId === 'importTab') loadBrandsForDelete();
             if (tabId === 'inventoryTab') loadBrandsForSetup();
             if (tabId === 'reportsTab') loadSessionsForReport();
         }
 
-        function updateDashboard() { document.getElementById('totalItemsBadge').innerText = itemsDB.length; }
+        function updateDashboard() { 
+            document.getElementById('totalItemsBadge').innerText = itemsDB.length; 
+            loadBrandsForDelete();
+        }
 
         function importExcel() {
             const fileInput = document.getElementById('excelFileInput');
@@ -476,6 +482,32 @@
                 localStorage.removeItem('inventory_sessions');
                 itemsDB = []; sessionsDB = [];
                 updateDashboard(); alert("تم تصفير بيانات الجرد.");
+            }
+        }
+
+        // --- دالة حذف ماركة محددة ---
+        function loadBrandsForDelete() {
+            const brands = [...new Set(itemsDB.map(item => item.brand))];
+            const select = document.getElementById('deleteBrandSelect');
+            if (select) {
+                select.innerHTML = brands.length ? '<option value="">اختر الماركة للحذف...</option>' : '<option value="">لا توجد ماركات</option>';
+                brands.forEach(b => select.appendChild(new Option(b, b)));
+            }
+        }
+
+        function deleteBrandData() {
+            const brand = document.getElementById('deleteBrandSelect').value;
+            if (!brand) return alert("يرجى اختيار ماركة لحذفها.");
+
+            if (confirm(`هل أنت متأكد من حذف جميع أصناف وجلسات جرد ماركة (${brand})؟`)) {
+                itemsDB = itemsDB.filter(item => item.brand !== brand);
+                localStorage.setItem('inventory_items', JSON.stringify(itemsDB));
+
+                sessionsDB = sessionsDB.filter(session => session.brand !== brand);
+                localStorage.setItem('inventory_sessions', JSON.stringify(sessionsDB));
+
+                updateDashboard();
+                alert(`تم حذف بيانات ماركة ${brand} بنجاح.`);
             }
         }
 
