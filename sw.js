@@ -1,4 +1,5 @@
-const CACHE_NAME = 'inventory-app-v7'; 
+const CACHE_NAME = 'inventory-app-v9'; 
+const SHARED_CACHE = 'shared-file-cache'; // صندوق مخصص وثابت للملفات المشتركة
 
 const urlsToCache = [
     './',
@@ -19,7 +20,10 @@ self.addEventListener('activate', event => {
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) return caches.delete(cacheName);
+                    // لا تحذف صندوق الملفات المشتركة عند التحديث
+                    if (cacheName !== CACHE_NAME && cacheName !== SHARED_CACHE) {
+                        return caches.delete(cacheName);
+                    }
                 })
             );
         })
@@ -28,18 +32,18 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-    // التقاط الشيت المرسل عبر المشاركة 
+    // التقاط الشيت المرسل عبر المشاركة
     if (event.request.method === 'POST' && event.request.url.includes('share-target')) {
         event.respondWith((async () => {
             try {
                 const formData = await event.request.formData();
                 const file = formData.get('sharedFile');
                 if (file) {
-                    const cache = await caches.open(CACHE_NAME);
-                    // حفظ الملف باسم
-                    await cache.put('shared-excel-file', new Response(file));
+                    // حفظ الشيت في الصندوق المخصص
+                    const cache = await caches.open(SHARED_CACHE);
+                    await cache.put('/shared-excel', new Response(file));
                 }
-                // التوجيه الصحيح لمسار مشروعك على جيت هاب (الحل النهائي)
+                // التوجيه لمسار جيت هاب
                 return Response.redirect('/Stock-Control-El-Sewedy/?shared=1', 303);
             } catch (err) {
                 return Response.redirect('/Stock-Control-El-Sewedy/', 303);
@@ -48,7 +52,7 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // الكود العادي لتشغيل التطبيق أوفلاين
+    // الكود العادي للأوفلاين
     if (!event.request.url.startsWith('http')) return;
     event.respondWith(
         fetch(event.request).then(response => {
