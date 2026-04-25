@@ -437,13 +437,18 @@
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('shared') === '1') {
                 try {
-                    const cache = await caches.open('inventory-app-v4'); 
-                    const response = await cache.match('/shared-excel-file');
+                    // فتح إصدار الكاش الجديد v6
+                    const cache = await caches.open('inventory-app-v6'); 
+                    // جلب الملف بدون علامة /
+                    const response = await cache.match('shared-excel-file');
                     if (response) {
                         const blob = await response.blob();
                         const file = new File([blob], "shared-file.xlsx", { type: blob.type });
-                        await cache.delete('/shared-excel-file');
+                        await cache.delete('shared-excel-file');
+                        
+                        // تنظيف الرابط مع الحفاظ على مسار المشروع
                         window.history.replaceState({}, document.title, window.location.pathname);
+                        
                         if (confirm("تم استلام شيت إكسيل جديد عبر المشاركة. هل تريد استيراده الآن لتحديث بيانات الجرد؟")) {
                             switchTab('importTab');
                             processExcelFile(file);
@@ -452,7 +457,6 @@
                 } catch(e) { console.log("خطأ في قراءة الملف المشترك:", e); }
             }
         }
-
         function clearAllData() {
             if (confirm("هل أنت متأكد من مسح كافة البيانات والجلسات من هذا الجهاز بشكل نهائي؟")) {
                 localStorage.removeItem('inventory_items'); localStorage.removeItem('inventory_sessions');
