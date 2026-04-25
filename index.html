@@ -145,7 +145,7 @@
                             <span class="text-green-600">تم جرد: <span id="progCounted" class="text-green-800">0</span></span>
                             <span class="text-red-600">متبقي: <span id="progRemaining" class="text-red-800">0</span></span>
                         </div>
-                        <input type="text" id="searchInput" onkeyup="renderInventoryItems()" placeholder="بحث بالكود، أو اسم الصنف..." class="w-full border-2 border-blue-400 rounded-lg p-3 outline-none shadow-sm">
+                        <input type="text" id="searchInput" oninput="filterInventoryItems()" placeholder="بحث بالكود، أو اسم الصنف..." class="w-full border-2 border-blue-400 rounded-lg p-3 outline-none shadow-sm">
                     </div>
                     <div id="itemsList" class="space-y-3 mt-2"></div>
                 </div>
