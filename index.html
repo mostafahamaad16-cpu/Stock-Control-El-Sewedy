@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,25 +8,79 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="favicon.png">
-    
+
     <title>الجرد | السويدي أدوات</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f3f4f6; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .calc-btn { background-color: #e5e7eb; border-radius: 8px; padding: 15px; font-size: 1.25rem; font-weight: bold; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; }
-        .calc-btn:active { background-color: #d1d5db; transform: scale(0.95); }
-        .calc-btn.op { background-color: #fca5a5; color: #7f1d1d; }
-        .calc-btn.eq { background-color: #3b82f6; color: white; }
-        .calc-btn.del { background-color: #fcd34d; color: #78350f; }
-        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .calc-btn {
+            background-color: #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calc-btn:active {
+            background-color: #d1d5db;
+            transform: scale(0.95);
+        }
+
+        .calc-btn.op {
+            background-color: #fca5a5;
+            color: #7f1d1d;
+        }
+
+        .calc-btn.eq {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .calc-btn.del {
+            background-color: #fcd34d;
+            color: #78350f;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
         /* شاشة تسجيل الدخول */
-        #authOverlay { position: fixed; inset: 0; background-color: #f3f4f6; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        #authOverlay {
+            position: fixed;
+            inset: 0;
+            background-color: #f3f4f6;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
     </style>
 </head>
+
 <body class="text-gray-800 flex flex-col min-h-screen">
 
     <div id="authOverlay">
@@ -34,27 +89,34 @@
                 <h1 class="text-2xl font-bold text-blue-700 mb-2">السويدي أدوات</h1>
                 <p class="text-gray-500 text-sm">تطبيق مراقبة المخزون والجرد (يدعم العمل أوفلاين)</p>
             </div>
-            
+
             <div id="loginForm">
                 <h2 class="text-lg font-bold text-center mb-4 border-b pb-2">تسجيل الدخول</h2>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">رقم الموبايل</label>
-                        <input type="tel" id="loginPhone" placeholder="أدخل رقم الموبايل" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
+                        <input type="tel" id="loginPhone" placeholder="أدخل رقم الموبايل"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left"
+                            dir="ltr">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
-                        <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
+                        <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left"
+                            dir="ltr">
                     </div>
-                    
+
                     <div class="flex items-center gap-2 mt-2">
                         <input type="checkbox" id="rememberMe" checked class="w-4 h-4 text-blue-600 rounded">
                         <label for="rememberMe" class="text-sm font-bold text-gray-600">تذكر تسجيل الدخول</label>
                     </div>
 
-                    <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition mt-4 text-lg">دخول</button>
+                    <button onclick="handleLogin()"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition mt-4 text-lg">دخول</button>
                 </div>
-                <p class="text-sm text-center text-gray-600 mt-4">ليس لديك حساب؟ <button onclick="toggleAuthMode('register')" class="text-blue-600 font-bold underline outline-none">إنشاء حساب جديد</button></p>
+                <p class="text-sm text-center text-gray-600 mt-4">ليس لديك حساب؟ <button
+                        onclick="toggleAuthMode('register')"
+                        class="text-blue-600 font-bold underline outline-none">إنشاء حساب جديد</button></p>
             </div>
 
             <div id="registerForm" class="hidden">
@@ -62,20 +124,29 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">الاسم بالكامل</label>
-                        <input type="text" id="regName" placeholder="أدخل اسمك ثلاثي" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500">
+                        <input type="text" id="regName" placeholder="أدخل اسمك ثلاثي"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">رقم الموبايل</label>
-                        <input type="tel" id="regPhone" placeholder="أدخل رقم الموبايل" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
+                        <input type="tel" id="regPhone" placeholder="أدخل رقم الموبايل"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left"
+                            dir="ltr">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
-                        <input type="password" id="regPassword" placeholder="أنشئ كلمة مرور قوية" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
+                        <input type="password" id="regPassword" placeholder="أنشئ كلمة مرور قوية"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left"
+                            dir="ltr">
                     </div>
 
-                    <button onclick="handleRegister()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow hover:bg-green-700 transition mt-4 text-lg">تسجيل الحساب</button>
+                    <button onclick="handleRegister()"
+                        class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow hover:bg-green-700 transition mt-4 text-lg">تسجيل
+                        الحساب</button>
                 </div>
-                <p class="text-sm text-center text-gray-600 mt-4">لديك حساب بالفعل؟ <button onclick="toggleAuthMode('login')" class="text-blue-600 font-bold underline outline-none">تسجيل الدخول</button></p>
+                <p class="text-sm text-center text-gray-600 mt-4">لديك حساب بالفعل؟ <button
+                        onclick="toggleAuthMode('login')" class="text-blue-600 font-bold underline outline-none">تسجيل
+                        الدخول</button></p>
             </div>
         </div>
     </div>
@@ -84,16 +155,29 @@
         <nav class="bg-blue-600 text-white shadow-md sticky top-0 z-20">
             <div class="flex justify-between items-center px-4 py-3 border-b border-blue-500 bg-blue-700">
                 <div class="font-bold text-lg tracking-wide">السويدي أدوات</div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <button id="installAppBtn"
+                        class="hidden text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded shadow font-bold">تثبيت
+                        التطبيق ⬇</button>
+
                     <span id="welcomeName" class="text-sm font-bold text-blue-200"></span>
-                    <button onclick="logout()" class="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded shadow">خروج</button>
+                    <button onclick="logout()"
+                        class="text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded shadow">خروج</button>
                 </div>
             </div>
             <div class="flex justify-around overflow-x-auto">
-                <button onclick="switchTab('importTab')" class="flex-1 py-3 px-2 font-bold border-b-4 border-transparent whitespace-nowrap focus:outline-none" id="btn-importTab">البيانات</button>
-                <button onclick="switchTab('inventoryTab')" class="flex-1 py-3 px-2 font-bold border-b-4 border-transparent whitespace-nowrap focus:outline-none" id="btn-inventoryTab">الجرد</button>
-                <button onclick="switchTab('reportsTab')" class="flex-1 py-3 px-2 font-bold border-b-4 border-transparent whitespace-nowrap focus:outline-none" id="btn-reportsTab">التقارير</button>
-                <button onclick="switchTab('usersTab')" class="flex-1 py-3 px-2 font-bold border-b-4 border-transparent whitespace-nowrap focus:outline-none hidden" id="btn-usersTab">المستخدمين</button>
+                <button onclick="switchTab('importTab')"
+                    class="flex-1 py-3 px-2 font-bold border-b-4 border-transparent whitespace-nowrap focus:outline-none"
+                    id="btn-importTab">البيانات</button>
+                <button onclick="switchTab('inventoryTab')"
+                    class="flex-1 py-3 px-2 font-bold border-b-4 border-transparent whitespace-nowrap focus:outline-none"
+                    id="btn-inventoryTab">الجرد</button>
+                <button onclick="switchTab('reportsTab')"
+                    class="flex-1 py-3 px-2 font-bold border-b-4 border-transparent whitespace-nowrap focus:outline-none"
+                    id="btn-reportsTab">التقارير</button>
+                <button onclick="switchTab('usersTab')"
+                    class="flex-1 py-3 px-2 font-bold border-b-4 border-transparent whitespace-nowrap focus:outline-none hidden"
+                    id="btn-usersTab">المستخدمين</button>
             </div>
         </nav>
 
@@ -101,20 +185,27 @@
 
             <div id="importTab" class="tab-content active">
                 <h2 class="text-xl font-bold mb-4 text-center">إدارة قاعدة البيانات</h2>
-                
+
                 <div class="bg-white p-6 rounded-xl shadow-sm mb-4 border border-gray-200">
                     <h3 class="font-bold mb-2 text-blue-600">استيراد من إكسيل</h3>
-                    <p class="text-sm text-gray-500 mb-4">الأعمدة المطلوبة: (كود الصنف، اسم الصنف، الماركة، الرصيد الدفتري)</p>
-                    <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4" />
-                    <button onclick="importExcel()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition">بدء الاستيراد وتحديث البيانات</button>
+                    <p class="text-sm text-gray-500 mb-4">الأعمدة المطلوبة: (كود الصنف، اسم الصنف، الماركة، الرصيد
+                        الدفتري)</p>
+                    <input type="file" id="excelFileInput" accept=".xlsx, .xls"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 mb-4" />
+                    <button onclick="importExcel()"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition">بدء
+                        الاستيراد وتحديث البيانات</button>
                 </div>
 
                 <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center border border-gray-200">
                     <span class="font-bold">إجمالي الأصناف المسجلة:</span>
-                    <span id="totalItemsBadge" class="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-lg">0</span>
+                    <span id="totalItemsBadge"
+                        class="bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-lg">0</span>
                 </div>
-                
-                <button id="clearDataBtn" onclick="clearAllData()" class="mt-8 w-full bg-red-100 text-red-700 border border-red-300 py-3 rounded-lg font-bold hidden">مسح كافة البيانات (للمدير فقط)</button>
+
+                <button id="clearDataBtn" onclick="clearAllData()"
+                    class="mt-8 w-full bg-red-100 text-red-700 border border-red-300 py-3 rounded-lg font-bold hidden">مسح
+                    كافة البيانات (للمدير فقط)</button>
             </div>
 
             <div id="inventoryTab" class="tab-content">
@@ -122,29 +213,40 @@
                     <h2 class="text-xl font-bold mb-4">بدء جرد جديد</h2>
                     <div class="mb-4">
                         <label class="block text-sm font-bold text-gray-700 mb-1">الماركة المراد جردها</label>
-                        <select id="brandSelect" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500"></select>
+                        <select id="brandSelect"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500"></select>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-bold text-gray-700 mb-1">تاريخ الجرد</label>
-                        <input type="date" id="inventoryDate" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500">
+                        <input type="date" id="inventoryDate"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500">
                     </div>
-                    <button onclick="startInventory()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow text-lg">بدء الجرد</button>
+                    <button onclick="startInventory()"
+                        class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow text-lg">بدء
+                        الجرد</button>
                 </div>
 
                 <div id="inventoryWorkspace" class="hidden">
                     <div class="sticky top-[100px] bg-[#f3f4f6] pb-3 pt-2 z-10">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="font-bold text-lg" id="currentSessionTitle">جرد ماركة: ...</h3>
-                            <button onclick="endInventory()" class="text-sm bg-blue-600 text-white font-bold px-3 py-2 rounded shadow">الخروج للتقارير</button>
-                        </div>
-                        
-                        <div class="flex justify-between text-xs font-bold bg-white p-2 rounded-lg shadow-sm border border-gray-200 mb-2">
-                            <span class="text-gray-600">إجمالي: <span id="progTotal" class="text-black">0</span></span>
-                            <span class="text-green-600">تم جرد: <span id="progCounted" class="text-green-800">0</span></span>
-                            <span class="text-red-600">متبقي: <span id="progRemaining" class="text-red-800">0</span></span>
+                            <button onclick="endInventory()"
+                                class="text-sm bg-blue-600 text-white font-bold px-3 py-2 rounded shadow">الخروج
+                                للتقارير</button>
                         </div>
 
-                        <input type="text" id="searchInput" onkeyup="renderInventoryItems()" placeholder="بحث بالكود، أو اسم الصنف..." class="w-full border-2 border-blue-400 rounded-lg p-3 outline-none shadow-sm">
+                        <div
+                            class="flex justify-between text-xs font-bold bg-white p-2 rounded-lg shadow-sm border border-gray-200 mb-2">
+                            <span class="text-gray-600">إجمالي: <span id="progTotal" class="text-black">0</span></span>
+                            <span class="text-green-600">تم جرد: <span id="progCounted"
+                                    class="text-green-800">0</span></span>
+                            <span class="text-red-600">متبقي: <span id="progRemaining"
+                                    class="text-red-800">0</span></span>
+                        </div>
+
+                        <input type="text" id="searchInput" onkeyup="renderInventoryItems()"
+                            placeholder="بحث بالكود، أو اسم الصنف..."
+                            class="w-full border-2 border-blue-400 rounded-lg p-3 outline-none shadow-sm">
                     </div>
 
                     <div id="itemsList" class="space-y-3 mt-2"></div>
@@ -154,14 +256,16 @@
             <div id="reportsTab" class="tab-content">
                 <h2 class="text-xl font-bold mb-4 text-center">تقارير الجرد</h2>
                 <div class="mb-4">
-                    <select id="reportSessionSelect" onchange="renderReport()" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500">
+                    <select id="reportSessionSelect" onchange="renderReport()"
+                        class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500">
                         <option value="">اختر جلسة الجرد لعرضها...</option>
                     </select>
                 </div>
-                
+
                 <div id="reportContainer" class="hidden">
                     <div class="flex flex-col gap-3 mb-4">
-                        <select id="reportFilterStatus" onchange="renderReport()" class="w-full border-2 border-gray-300 rounded-lg p-3 font-bold text-sm outline-none focus:border-blue-500 bg-white">
+                        <select id="reportFilterStatus" onchange="renderReport()"
+                            class="w-full border-2 border-gray-300 rounded-lg p-3 font-bold text-sm outline-none focus:border-blue-500 bg-white">
                             <option value="all">عرض كافة الأصناف</option>
                             <option value="matched">عرض الأصناف المضبوطة (متطابقة فقط)</option>
                             <option value="deficit">عرض الأصناف التي بها (عجز) فقط</option>
@@ -169,18 +273,33 @@
                         </select>
 
                         <div class="flex gap-2">
-                            <button onclick="resumeInventorySession()" class="flex-1 bg-yellow-500 text-white py-2 rounded-lg font-bold shadow text-sm">تعديل هذا الجرد</button>
-                            <button onclick="exportToExcel()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold shadow text-sm">تصدير لإكسيل</button>
+                            <button onclick="resumeInventorySession()"
+                                class="flex-1 bg-yellow-500 text-white py-2 rounded-lg font-bold shadow text-sm">تعديل
+                                هذا الجرد</button>
+                            <button onclick="exportToExcel()"
+                                class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold shadow text-sm">تصدير
+                                لإكسيل</button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-2 mb-4 text-center">
-                        <div class="bg-blue-100 p-3 rounded-lg"><p class="text-xs text-blue-700 font-bold">إجمالي دفتري</p><p id="repBook" class="font-bold text-lg">0</p></div>
-                        <div class="bg-green-100 p-3 rounded-lg"><p class="text-xs text-green-700 font-bold">إجمالي فعلي</p><p id="repActual" class="font-bold text-lg">0</p></div>
-                        <div class="bg-red-100 p-3 rounded-lg"><p class="text-xs text-red-700 font-bold">الفرق</p><p id="repDiff" class="font-bold text-lg">0</p></div>
+                        <div class="bg-blue-100 p-3 rounded-lg">
+                            <p class="text-xs text-blue-700 font-bold">إجمالي دفتري</p>
+                            <p id="repBook" class="font-bold text-lg">0</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <p class="text-xs text-green-700 font-bold">إجمالي فعلي</p>
+                            <p id="repActual" class="font-bold text-lg">0</p>
+                        </div>
+                        <div class="bg-red-100 p-3 rounded-lg">
+                            <p class="text-xs text-red-700 font-bold">الفرق</p>
+                            <p id="repDiff" class="font-bold text-lg">0</p>
+                        </div>
                     </div>
-                    
-                    <input type="text" id="reportSearchInput" onkeyup="renderReport()" placeholder="تصفية بالكود أو اسم الصنف..." class="w-full border-2 border-gray-300 rounded-lg p-2 mb-3 outline-none focus:border-blue-500 text-sm">
+
+                    <input type="text" id="reportSearchInput" onkeyup="renderReport()"
+                        placeholder="تصفية بالكود أو اسم الصنف..."
+                        class="w-full border-2 border-gray-300 rounded-lg p-2 mb-3 outline-none focus:border-blue-500 text-sm">
 
                     <div class="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
                         <table class="w-full text-sm text-right">
@@ -230,9 +349,12 @@
                 <button onclick="closeCalc()" class="text-white text-3xl leading-none">&times;</button>
             </div>
             <div class="p-4">
-                <p class="text-sm text-gray-500 mb-1">الرصيد الفعلي الحالي: <span id="calcCurrentActual" class="font-bold text-black text-lg">0</span></p>
-                <input type="text" id="calcDisplay" readonly class="w-full bg-gray-100 border-2 border-gray-200 rounded-lg p-3 text-left text-2xl font-bold mb-4 outline-none" placeholder="0">
-                
+                <p class="text-sm text-gray-500 mb-1">الرصيد الفعلي الحالي: <span id="calcCurrentActual"
+                        class="font-bold text-black text-lg">0</span></p>
+                <input type="text" id="calcDisplay" readonly
+                    class="w-full bg-gray-100 border-2 border-gray-200 rounded-lg p-3 text-left text-2xl font-bold mb-4 outline-none"
+                    placeholder="0">
+
                 <div class="grid grid-cols-4 gap-2 mb-4" dir="ltr">
                     <div class="calc-btn" onclick="calcPress('7')">7</div>
                     <div class="calc-btn" onclick="calcPress('8')">8</div>
@@ -253,12 +375,14 @@
                     <div class="calc-btn" onclick="calcPress('0')">0</div>
                     <div class="calc-btn" onclick="calcPress('.')">.</div>
                     <div class="calc-btn del text-2xl" onclick="calcBackspace()">⌫</div>
-                    
+
                     <div class="calc-btn op col-span-2" onclick="calcPress('+')">+</div>
                     <div class="calc-btn eq col-span-2" onclick="calcCalculate()">= الناتج</div>
                 </div>
 
-                <button onclick="addResultToActual()" class="w-full bg-green-500 text-white py-3 rounded-lg font-bold text-lg shadow">إضافة الناتج للرصيد الفعلي</button>
+                <button onclick="addResultToActual()"
+                    class="w-full bg-green-500 text-white py-3 rounded-lg font-bold text-lg shadow">إضافة الناتج للرصيد
+                    الفعلي</button>
             </div>
         </div>
     </div>
@@ -271,14 +395,48 @@
             });
         }
 
+        // --- كود تثبيت التطبيق (PWA) ---
+        let deferredPrompt;
+        const installAppBtn = document.getElementById('installAppBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // منع المتصفح من إظهار الإشعار التلقائي المزعج
+            e.preventDefault();
+            // حفظ الحدث لاستخدامه عند الضغط على الزر
+            deferredPrompt = e;
+            // إظهار زر التثبيت الخاص بنا
+            installAppBtn.classList.remove('hidden');
+        });
+
+        installAppBtn.addEventListener('click', async () => {
+            if (deferredPrompt !== null) {
+                // إظهار نافذة التثبيت الرسمية من المتصفح
+                deferredPrompt.prompt();
+                // انتظار رد المستخدم (موافق أم إلغاء)
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('تمت الموافقة على التثبيت');
+                    // إخفاء الزر بعد التثبيت
+                    installAppBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // إخفاء الزر إذا تم تثبيت التطبيق بنجاح
+        window.addEventListener('appinstalled', () => {
+            installAppBtn.classList.add('hidden');
+            deferredPrompt = null;
+        });
+
         // --- تهيئة البيانات ---
         let itemsDB = JSON.parse(localStorage.getItem('inventory_items')) || [];
         let sessionsDB = JSON.parse(localStorage.getItem('inventory_sessions')) || [];
         let usersDB = JSON.parse(localStorage.getItem('inventory_users')) || [];
-        
+
         // التحقق من الجلسة في LocalStorage (تذكرني) أو SessionStorage (لا تتذكرني)
         let currentUser = JSON.parse(localStorage.getItem('inventory_current_user')) || JSON.parse(sessionStorage.getItem('inventory_current_user')) || null;
-        
+
         let currentSession = null;
         let calcTargetItemCode = null;
         let calcCurrentValue = 0;
@@ -304,7 +462,7 @@
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'flex';
                 document.getElementById('welcomeName').innerText = `أهلاً، ${currentUser.name.split(' ')[0]}`;
-                
+
                 if (currentUser.isAdmin) {
                     document.getElementById('btn-usersTab').classList.remove('hidden');
                     document.getElementById('clearDataBtn').classList.remove('hidden');
@@ -312,7 +470,7 @@
                     document.getElementById('btn-usersTab').classList.add('hidden');
                     document.getElementById('clearDataBtn').classList.add('hidden');
                 }
-                
+
                 switchTab('importTab');
                 document.getElementById('inventoryDate').valueAsDate = new Date();
                 updateDashboard();
@@ -326,7 +484,7 @@
             const name = document.getElementById('regName').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const password = document.getElementById('regPassword').value;
-            
+
             if (!name || !phone || !password) return alert("يرجى إدخال الاسم، رقم الموبايل، وكلمة المرور.");
 
             // ======= التعديل الأمني هنا: ضع رقمك الحقيقي =======
@@ -338,19 +496,19 @@
                 return alert("رقم الموبايل مسجل بالفعل. يرجى تسجيل الدخول.");
             }
 
-            let isThisUserAdmin = (phone === ADMIN_PHONE); 
-            
+            let isThisUserAdmin = (phone === ADMIN_PHONE);
+
             let newUser = {
                 phone: phone,
                 name: name,
                 password: password,
-                isActive: isThisUserAdmin, 
-                isAdmin: isThisUserAdmin   
+                isActive: isThisUserAdmin,
+                isAdmin: isThisUserAdmin
             };
-            
+
             usersDB.push(newUser);
             localStorage.setItem('inventory_users', JSON.stringify(usersDB));
-            
+
             if (isThisUserAdmin) {
                 alert("مرحباً بك يا مصطفى! تم التحقق من هويتك كمدير للنظام.");
                 currentUser = newUser;
@@ -371,7 +529,7 @@
             const phone = document.getElementById('loginPhone').value.trim();
             const password = document.getElementById('loginPassword').value;
             const rememberMe = document.getElementById('rememberMe').checked;
-            
+
             if (!phone || !password) return alert("يرجى إدخال رقم الموبايل وكلمة المرور.");
 
             let existingUser = usersDB.find(u => u.phone === phone);
@@ -387,14 +545,14 @@
             if (!existingUser.isActive) {
                 return alert("حسابك قيد المراجعة. يرجى انتظار تفعيل المدير للحساب.");
             }
-            
+
             currentUser = existingUser;
             saveSession(rememberMe);
             checkAuth();
         }
 
         function saveSession(remember) {
-            if(remember) {
+            if (remember) {
                 localStorage.setItem('inventory_current_user', JSON.stringify(currentUser));
                 sessionStorage.removeItem('inventory_current_user');
             } else {
@@ -414,14 +572,14 @@
         function renderUsersTable() {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = '';
-            
+
             usersDB.forEach((user, index) => {
-                let statusBadge = user.isActive 
-                    ? '<span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">مفعل</span>' 
+                let statusBadge = user.isActive
+                    ? '<span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">مفعل</span>'
                     : '<span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">غير مفعل</span>';
-                
+
                 let adminBadge = user.isAdmin ? '<span class="text-blue-600 font-bold text-xs mr-2">(مدير)</span>' : '';
-                
+
                 let toggleBtn = user.isAdmin ? '' : `<button onclick="toggleUserStatus(${index})" class="text-xs bg-yellow-500 text-white px-2 py-1 rounded mx-1">${user.isActive ? 'إيقاف' : 'تفعيل'}</button>`;
                 let deleteBtn = user.isAdmin ? '' : `<button onclick="deleteUser(${index})" class="text-xs bg-red-600 text-white px-2 py-1 rounded mx-1">حذف</button>`;
 
@@ -444,7 +602,7 @@
         }
 
         function deleteUser(index) {
-            if(confirm(`هل أنت متأكد من حذف حساب ${usersDB[index].name}؟`)) {
+            if (confirm(`هل أنت متأكد من حذف حساب ${usersDB[index].name}؟`)) {
                 usersDB.splice(index, 1);
                 localStorage.setItem('inventory_users', JSON.stringify(usersDB));
                 renderUsersTable();
@@ -467,22 +625,22 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            
+
             ['importTab', 'inventoryTab', 'reportsTab', 'usersTab'].forEach(id => {
                 const btn = document.getElementById(`btn-${id}`);
-                if(btn) {
+                if (btn) {
                     btn.classList.remove('border-white', 'text-white');
                     btn.classList.add('text-blue-200', 'border-transparent');
-                    if(id === tabId) {
+                    if (id === tabId) {
                         btn.classList.remove('text-blue-200', 'border-transparent');
                         btn.classList.add('border-white', 'text-white');
                     }
                 }
             });
 
-            if(tabId === 'inventoryTab') loadBrandsForSetup();
-            if(tabId === 'reportsTab') loadSessionsForReport();
-            if(tabId === 'usersTab') renderUsersTable();
+            if (tabId === 'inventoryTab') loadBrandsForSetup();
+            if (tabId === 'reportsTab') loadSessionsForReport();
+            if (tabId === 'usersTab') renderUsersTable();
         }
 
         function updateDashboard() {
@@ -495,12 +653,12 @@
             if (!fileInput.files.length) return alert("يرجى اختيار ملف إكسيل أولاً");
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
+                const workbook = XLSX.read(data, { type: 'array' });
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 
-                if(json.length === 0) return alert("الملف فارغ!");
+                if (json.length === 0) return alert("الملف فارغ!");
 
                 let newItems = [];
                 let importedBrands = new Set();
@@ -524,7 +682,7 @@
                 itemsDB = itemsDB.filter(item => !importedBrands.has(item.brand));
                 itemsDB = itemsDB.concat(newItems);
                 localStorage.setItem('inventory_items', JSON.stringify(itemsDB));
-                
+
                 alert(`تم بنجاح!\nتحديث ${importedBrands.size} ماركة بإجمالي ${newItems.length} صنف.`);
                 fileInput.value = '';
                 updateDashboard();
@@ -533,12 +691,12 @@
         }
 
         function clearAllData() {
-            if(!currentUser.isAdmin) return alert("غير مصرح لك");
-            if(confirm("هل أنت متأكد من مسح كافة البيانات والجلسات بشكل نهائي؟")) {
+            if (!currentUser.isAdmin) return alert("غير مصرح لك");
+            if (confirm("هل أنت متأكد من مسح كافة البيانات والجلسات بشكل نهائي؟")) {
                 localStorage.removeItem('inventory_items');
                 localStorage.removeItem('inventory_sessions');
                 itemsDB = []; sessionsDB = [];
-                updateDashboard(); 
+                updateDashboard();
                 alert("تم تصفير بيانات الجرد.");
             }
         }
@@ -554,10 +712,10 @@
         function startInventory() {
             const brand = document.getElementById('brandSelect').value;
             const date = document.getElementById('inventoryDate').value;
-            if(!brand) return alert("يرجى اختيار ماركة.");
+            if (!brand) return alert("يرجى اختيار ماركة.");
 
             const brandItems = itemsDB.filter(item => item.brand === brand);
-            
+
             currentSession = {
                 id: Date.now(),
                 brand: brand,
@@ -570,11 +728,11 @@
                     name: item.name,
                     bookQty: item.bookQty || 0,
                     actualQty: 0,
-                    isCounted: false 
+                    isCounted: false
                 };
             });
 
-            autoSaveSession(); 
+            autoSaveSession();
             openWorkspace();
         }
 
@@ -583,13 +741,13 @@
             document.getElementById('inventorySetup').classList.add('hidden');
             document.getElementById('inventoryWorkspace').classList.remove('hidden');
             document.getElementById('searchInput').value = '';
-            
+
             updateProgress();
             renderInventoryItems();
         }
 
         function updateProgress() {
-            if(!currentSession) return;
+            if (!currentSession) return;
             const recordsArray = Object.values(currentSession.records);
             const total = recordsArray.length;
             const counted = recordsArray.filter(r => r.isCounted).length;
@@ -601,15 +759,15 @@
         }
 
         function renderInventoryItems() {
-            if(!currentSession) return;
+            if (!currentSession) return;
             const searchTxt = document.getElementById('searchInput').value.toLowerCase();
             const listContainer = document.getElementById('itemsList');
             listContainer.innerHTML = '';
 
             const itemsToRender = Object.keys(currentSession.records).map(code => ({
                 code: code, ...currentSession.records[code]
-            })).filter(item => 
-                item.code.toLowerCase().includes(searchTxt) || 
+            })).filter(item =>
+                item.code.toLowerCase().includes(searchTxt) ||
                 item.name.toLowerCase().includes(searchTxt)
             );
 
@@ -652,7 +810,7 @@
         function updateRecord(code, field, value) {
             let val = parseFloat(value) || 0;
             currentSession.records[code][field] = val;
-            
+
             currentSession.records[code].isCounted = true;
             updateProgress();
             autoSaveSession();
@@ -661,7 +819,7 @@
             let actual = currentSession.records[code].actualQty;
             let diff = actual - book;
             let diffEl = document.getElementById(`diff_${code}`);
-            if(diffEl) {
+            if (diffEl) {
                 diffEl.innerText = diff > 0 ? `+${diff}` : diff;
                 diffEl.className = diff === 0 ? 'text-gray-500' : (diff > 0 ? 'text-green-600' : 'text-red-600');
                 renderInventoryItems();
@@ -701,7 +859,7 @@
             let display = document.getElementById('calcDisplay');
             try {
                 let result = eval(display.value);
-                if(result !== undefined) display.value = result;
+                if (result !== undefined) display.value = result;
             } catch (e) { display.value = 'خطأ'; }
         }
 
@@ -709,12 +867,12 @@
             calcCalculate();
             let addedValue = parseFloat(document.getElementById('calcDisplay').value) || 0;
             let newActual = calcCurrentValue + addedValue;
-            
+
             updateRecord(calcTargetItemCode, 'actualQty', newActual);
-            
+
             let inputEl = document.getElementById(`actual_${calcTargetItemCode}`);
-            if(inputEl) inputEl.value = newActual;
-            
+            if (inputEl) inputEl.value = newActual;
+
             closeCalc();
         }
 
@@ -725,30 +883,30 @@
             [...sessionsDB].reverse().forEach(session => {
                 let opt = document.createElement('option');
                 opt.value = session.id;
-                let dateStr = new Date(session.id).toLocaleString('ar-EG', {hour12:true, year:'numeric', month:'numeric', day:'numeric', hour:'numeric', minute:'numeric'});
+                let dateStr = new Date(session.id).toLocaleString('ar-EG', { hour12: true, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
                 opt.textContent = `${session.brand} - ${session.date} (${dateStr})`;
                 select.appendChild(opt);
             });
             document.getElementById('reportContainer').classList.add('hidden');
-            document.getElementById('reportSearchInput').value = ''; 
+            document.getElementById('reportSearchInput').value = '';
             document.getElementById('reportFilterStatus').value = 'all';
         }
 
         function renderReport() {
             const sessionId = document.getElementById('reportSessionSelect').value;
-            if(!sessionId) {
+            if (!sessionId) {
                 document.getElementById('reportContainer').classList.add('hidden');
                 return;
             }
 
             const session = sessionsDB.find(s => s.id == sessionId);
-            if(!session) return;
+            if (!session) return;
 
             document.getElementById('reportContainer').classList.remove('hidden');
-            
+
             const searchTxt = document.getElementById('reportSearchInput').value.toLowerCase();
             const filterStatus = document.getElementById('reportFilterStatus').value;
-            
+
             const tbody = document.getElementById('reportTableBody');
             tbody.innerHTML = '';
 
@@ -757,10 +915,10 @@
             const filteredCodes = Object.keys(session.records).filter(code => {
                 const rec = session.records[code];
                 const matchesSearch = code.toLowerCase().includes(searchTxt) || rec.name.toLowerCase().includes(searchTxt);
-                
+
                 let diff = rec.actualQty - rec.bookQty;
                 let matchesFilter = true;
-                
+
                 if (filterStatus === 'matched') matchesFilter = diff === 0;
                 if (filterStatus === 'deficit') matchesFilter = diff < 0;
                 if (filterStatus === 'surplus') matchesFilter = diff > 0;
@@ -773,7 +931,7 @@
                 totalBook += rec.bookQty;
                 totalActual += rec.actualQty;
                 let diff = rec.actualQty - rec.bookQty;
-                
+
                 let tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-gray-50";
                 tr.innerHTML = `
@@ -788,7 +946,7 @@
 
             document.getElementById('repBook').innerText = totalBook;
             document.getElementById('repActual').innerText = totalActual;
-            
+
             let totalDiff = totalActual - totalBook;
             let diffEl = document.getElementById('repDiff');
             diffEl.innerText = totalDiff;
@@ -797,10 +955,10 @@
 
         function resumeInventorySession() {
             const sessionId = document.getElementById('reportSessionSelect').value;
-            if(!sessionId) return;
-            
+            if (!sessionId) return;
+
             const sessionToResume = sessionsDB.find(s => s.id == sessionId);
-            if(sessionToResume) {
+            if (sessionToResume) {
                 currentSession = sessionToResume;
                 switchTab('inventoryTab');
                 openWorkspace();
@@ -810,7 +968,7 @@
         function exportToExcel() {
             const sessionId = document.getElementById('reportSessionSelect').value;
             const session = sessionsDB.find(s => s.id == sessionId);
-            if(!session) return;
+            if (!session) return;
 
             let excelData = [['كود الصنف', 'اسم الصنف', 'الماركة', 'رصيد دفتري', 'رصيد فعلي', 'الفرق', 'حالة الجرد']];
 
@@ -834,4 +992,5 @@
         }
     </script>
 </body>
+
 </html>
