@@ -13,37 +13,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f3f4f6;
-        }
-
+        body { font-family: system-ui, sans-serif; background-color: #f3f4f6; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        .calc-btn {
-            background-color: #e5e7eb; border-radius: 8px; padding: 15px;
-            font-size: 1.25rem; font-weight: bold; text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); cursor: pointer;
-            user-select: none; display: flex; align-items: center; justify-content: center;
-        }
+        .calc-btn { background-color: #e5e7eb; border-radius: 8px; padding: 15px; font-size: 1.25rem; font-weight: bold; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; }
         .calc-btn:active { background-color: #d1d5db; transform: scale(0.95); }
         .calc-btn.op { background-color: #fca5a5; color: #7f1d1d; }
         .calc-btn.eq { background-color: #3b82f6; color: white; }
         .calc-btn.del { background-color: #fcd34d; color: #78350f; }
-
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-
-        /* شاشة تسجيل الدخول */
-        #authOverlay {
-            position: fixed; inset: 0; background-color: #f3f4f6; z-index: 100;
-            display: flex; align-items: center; justify-content: center; padding: 1rem;
-        }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        #authOverlay { position: fixed; inset: 0; background-color: #f3f4f6; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem; }
     </style>
 </head>
 
 <body class="text-gray-800 flex flex-col min-h-screen">
+
+    <div id="onlineStatus" class="fixed top-0 left-0 right-0 text-center text-xs font-bold py-2 z-[110] transition-all hidden"></div>
 
     <div id="authOverlay">
         <div class="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl border border-gray-200">
@@ -55,21 +40,13 @@
             <div id="loginForm">
                 <h2 class="text-lg font-bold text-center mb-4 border-b pb-2">تسجيل الدخول</h2>
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">رقم الموبايل</label>
-                        <input type="tel" id="loginPhone" placeholder="أدخل رقم الموبايل" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
-                        <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
-                    </div>
-
+                    <input type="tel" id="loginPhone" placeholder="أدخل رقم الموبايل" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
+                    <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
                     <div class="flex items-center gap-2 mt-2">
                         <input type="checkbox" id="rememberMe" checked class="w-4 h-4 text-blue-600 rounded">
                         <label for="rememberMe" class="text-sm font-bold text-gray-600">تذكر تسجيل الدخول</label>
                     </div>
-
-                    <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition mt-4 text-lg">دخول</button>
+                    <button id="loginBtn" onclick="handleLogin()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition mt-4 text-lg">دخول</button>
                 </div>
                 <p class="text-sm text-center text-gray-600 mt-4">ليس لديك حساب على هذا الجهاز؟ <button onclick="toggleAuthMode('register')" class="text-blue-600 font-bold underline outline-none">إنشاء حساب</button></p>
             </div>
@@ -77,20 +54,10 @@
             <div id="registerForm" class="hidden">
                 <h2 class="text-lg font-bold text-center mb-4 border-b pb-2">إنشاء حساب جديد</h2>
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">الاسم بالكامل</label>
-                        <input type="text" id="regName" placeholder="أدخل اسمك ثلاثي" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">رقم الموبايل</label>
-                        <input type="tel" id="regPhone" placeholder="أدخل رقم الموبايل" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
-                        <input type="password" id="regPassword" placeholder="أنشئ كلمة مرور قوية" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
-                    </div>
-
-                    <button onclick="startRegistration()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow hover:bg-green-700 transition mt-4 text-lg">طلب تفعيل الحساب</button>
+                    <input type="text" id="regName" placeholder="أدخل اسمك ثلاثي" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500">
+                    <input type="tel" id="regPhone" placeholder="أدخل رقم الموبايل" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
+                    <input type="password" id="regPassword" placeholder="أنشئ كلمة مرور قوية" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-left" dir="ltr">
+                    <button id="regBtn" onclick="startRegistration()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow hover:bg-green-700 transition mt-4 text-lg">طلب تفعيل الحساب</button>
                 </div>
                 <p class="text-sm text-center text-gray-600 mt-4">لديك حساب مفعل؟ <button onclick="toggleAuthMode('login')" class="text-blue-600 font-bold underline outline-none">تسجيل الدخول</button></p>
             </div>
@@ -102,10 +69,7 @@
                     <p id="displayRequestCode" class="text-2xl font-bold text-orange-700 tracking-widest" dir="ltr"></p>
                 </div>
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">مفتاح التفعيل</label>
-                        <input type="text" id="activationKeyInput" placeholder="أدخل المفتاح المرسل لك" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-center text-xl font-bold tracking-widest" dir="ltr">
-                    </div>
+                    <input type="text" id="activationKeyInput" placeholder="أدخل المفتاح المرسل لك" class="w-full border-2 border-gray-300 rounded-lg p-3 outline-none focus:border-blue-500 text-center text-xl font-bold tracking-widest" dir="ltr">
                     <button onclick="confirmActivation()" class="w-full bg-orange-600 text-white py-3 rounded-lg font-bold shadow hover:bg-orange-700 transition mt-4 text-lg">تفعيل وإكمال التسجيل</button>
                 </div>
                 <button onclick="toggleAuthMode('register')" class="w-full text-gray-500 underline mt-4 text-sm">إلغاء والعودة</button>
@@ -131,7 +95,6 @@
         </nav>
 
         <div class="p-4 flex-grow pb-20">
-
             <div id="importTab" class="tab-content active">
                 <h2 class="text-xl font-bold mb-4 text-center">إدارة قاعدة البيانات</h2>
 
@@ -177,16 +140,13 @@
                             <h3 class="font-bold text-lg" id="currentSessionTitle">جرد ماركة: ...</h3>
                             <button onclick="endInventory()" class="text-sm bg-blue-600 text-white font-bold px-3 py-2 rounded shadow">الخروج للتقارير</button>
                         </div>
-
                         <div class="flex justify-between text-xs font-bold bg-white p-2 rounded-lg shadow-sm border border-gray-200 mb-2">
                             <span class="text-gray-600">إجمالي: <span id="progTotal" class="text-black">0</span></span>
                             <span class="text-green-600">تم جرد: <span id="progCounted" class="text-green-800">0</span></span>
                             <span class="text-red-600">متبقي: <span id="progRemaining" class="text-red-800">0</span></span>
                         </div>
-
                         <input type="text" id="searchInput" onkeyup="renderInventoryItems()" placeholder="بحث بالكود، أو اسم الصنف..." class="w-full border-2 border-blue-400 rounded-lg p-3 outline-none shadow-sm">
                     </div>
-
                     <div id="itemsList" class="space-y-3 mt-2"></div>
                 </div>
             </div>
@@ -207,21 +167,17 @@
                             <option value="deficit">عرض الأصناف التي بها (عجز) فقط</option>
                             <option value="surplus">عرض الأصناف التي بها (زيادة) فقط</option>
                         </select>
-
                         <div class="flex gap-2">
                             <button onclick="resumeInventorySession()" class="flex-1 bg-yellow-500 text-white py-2 rounded-lg font-bold shadow text-sm">تعديل هذا الجرد</button>
                             <button onclick="exportToExcel()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold shadow text-sm">تصدير لإكسيل</button>
                         </div>
                     </div>
-
                     <div class="grid grid-cols-3 gap-2 mb-4 text-center">
                         <div class="bg-blue-100 p-3 rounded-lg"><p class="text-xs text-blue-700 font-bold">إجمالي دفتري</p><p id="repBook" class="font-bold text-lg">0</p></div>
                         <div class="bg-green-100 p-3 rounded-lg"><p class="text-xs text-green-700 font-bold">إجمالي فعلي</p><p id="repActual" class="font-bold text-lg">0</p></div>
                         <div class="bg-red-100 p-3 rounded-lg"><p class="text-xs text-red-700 font-bold">الفرق</p><p id="repDiff" class="font-bold text-lg">0</p></div>
                     </div>
-
                     <input type="text" id="reportSearchInput" onkeyup="renderReport()" placeholder="تصفية بالكود أو اسم الصنف..." class="w-full border-2 border-gray-300 rounded-lg p-2 mb-3 outline-none focus:border-blue-500 text-sm">
-
                     <div class="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
                         <table class="w-full text-sm text-right">
                             <thead class="bg-gray-100 text-gray-700">
@@ -238,9 +194,7 @@
                     </div>
                 </div>
             </div>
-
         </div>
-
         <footer class="mt-auto bg-gray-200 text-center py-4 text-gray-500 font-bold text-sm shadow-inner">
             Created by Mostafa Hamaad
         </footer>
@@ -270,20 +224,39 @@
     </div>
 
     <script>
-        // --- تسجيل Service Worker ---
+        // --- تهيئة ومراقبة حالة الإنترنت ---
+        let isOnline = navigator.onLine;
+
+        function updateOnlineStatus() {
+            isOnline = navigator.onLine;
+            const statusEl = document.getElementById('onlineStatus');
+            const loginBtn = document.getElementById('loginBtn');
+            const regBtn = document.getElementById('regBtn');
+
+            if (isOnline) {
+                statusEl.classList.add('hidden');
+                if (loginBtn) { loginBtn.disabled = false; loginBtn.style.opacity = "1"; }
+                if (regBtn) { regBtn.disabled = false; regBtn.style.opacity = "1"; }
+            } else {
+                statusEl.innerText = "أوفلاين - يرجى الاتصال بالإنترنت لتسجيل الدخول أو إنشاء حساب";
+                statusEl.className = "fixed top-0 left-0 right-0 text-center text-xs font-bold py-2 z-[110] transition-all bg-red-500 text-white";
+                if (loginBtn) { loginBtn.disabled = true; loginBtn.style.opacity = "0.5"; }
+                if (regBtn) { regBtn.disabled = true; regBtn.style.opacity = "0.5"; }
+            }
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        // --- PWA & SW ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Failed: ', err));
             });
         }
-
-        // --- كود التثبيت PWA ---
         let deferredPrompt;
         const installAppBtn = document.getElementById('installAppBtn');
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installAppBtn.classList.remove('hidden');
+            e.preventDefault(); deferredPrompt = e; installAppBtn.classList.remove('hidden');
         });
         installAppBtn.addEventListener('click', async () => {
             if (deferredPrompt !== null) {
@@ -294,7 +267,7 @@
             }
         });
 
-        // --- تهيئة البيانات ---
+        // --- Data Init ---
         let itemsDB = JSON.parse(localStorage.getItem('inventory_items')) || [];
         let sessionsDB = JSON.parse(localStorage.getItem('inventory_sessions')) || [];
         let usersDB = JSON.parse(localStorage.getItem('inventory_users')) || [];
@@ -303,25 +276,22 @@
         let currentSession = null;
         let calcTargetItemCode = null;
         let calcCurrentValue = 0;
-
         let tempRegData = null;
         let tempRequestCode = null;
 
-        window.onload = () => { checkAuth(); }
+        window.onload = () => {
+            updateOnlineStatus();
+            checkAuth();
+        }
 
-        // --- نظام التفعيل والتسجيل ---
+        // --- Auth Logic ---
         function toggleAuthMode(mode) {
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('registerForm').classList.add('hidden');
             document.getElementById('activationForm').classList.add('hidden');
-
-            if (mode === 'register') {
-                document.getElementById('registerForm').classList.remove('hidden');
-            } else if (mode === 'activation') {
-                document.getElementById('activationForm').classList.remove('hidden');
-            } else {
-                document.getElementById('loginForm').classList.remove('hidden');
-            }
+            if (mode === 'register') { document.getElementById('registerForm').classList.remove('hidden'); } 
+            else if (mode === 'activation') { document.getElementById('activationForm').classList.remove('hidden'); } 
+            else { document.getElementById('loginForm').classList.remove('hidden'); }
         }
 
         function checkAuth() {
@@ -333,6 +303,9 @@
                 switchTab('importTab');
                 document.getElementById('inventoryDate').valueAsDate = new Date();
                 updateDashboard();
+
+                // فحص الإكسيل المشترك بعد الدخول فقط
+                checkSharedFile();
             } else {
                 document.getElementById('authOverlay').style.display = 'flex';
                 document.getElementById('appContainer').style.display = 'none';
@@ -340,16 +313,16 @@
         }
 
         function startRegistration() {
+            if (!isOnline) return alert("يجب أن تكون متصلاً بالإنترنت لإنشاء حساب.");
             const name = document.getElementById('regName').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const password = document.getElementById('regPassword').value;
 
             if (!name || !phone || !password) return alert("يرجى إدخال جميع البيانات.");
-            if (usersDB.find(u => u.phone === phone)) return alert("الرقم مسجل بالفعل على هذا الجهاز. يرجى تسجيل الدخول.");
+            if (usersDB.find(u => u.phone === phone)) return alert("الرقم مسجل بالفعل. يرجى تسجيل الدخول.");
 
             tempRequestCode = Math.floor(1000 + Math.random() * 9000);
             tempRegData = { phone, name, password };
-
             document.getElementById('displayRequestCode').innerText = tempRequestCode;
             toggleAuthMode('activation');
         }
@@ -357,62 +330,45 @@
         function confirmActivation() {
             const inputKey = document.getElementById('activationKeyInput').value.trim();
             if (!inputKey) return alert("يرجى إدخال مفتاح التفعيل.");
-
             const correctKey = (tempRequestCode * 13) + 79;
-
             if (parseInt(inputKey) === correctKey) {
                 usersDB.push(tempRegData);
                 localStorage.setItem('inventory_users', JSON.stringify(usersDB));
-                
-                alert("تم تفعيل الحساب بنجاح! سيتم تسجيل دخولك الآن.");
+                alert("تم التفعيل بنجاح!");
                 currentUser = tempRegData;
-                saveSession(true);
-                checkAuth();
-                
-                tempRegData = null;
-                tempRequestCode = null;
-                document.getElementById('activationKeyInput').value = '';
+                saveSession(true); checkAuth();
+                tempRegData = null; tempRequestCode = null; document.getElementById('activationKeyInput').value = '';
             } else {
-                alert("مفتاح التفعيل غير صحيح. تأكد من الرقم الذي أرسله الآدمن.");
+                alert("المفتاح غير صحيح.");
             }
         }
 
         function handleLogin() {
+            if (!isOnline) return alert("يجب أن تكون متصلاً بالإنترنت لتسجيل الدخول.");
             const phone = document.getElementById('loginPhone').value.trim();
             const password = document.getElementById('loginPassword').value;
             const rememberMe = document.getElementById('rememberMe').checked;
 
-            if (!phone || !password) return alert("يرجى إدخال رقم الموبايل وكلمة المرور.");
-
+            if (!phone || !password) return alert("أكمل البيانات.");
             let existingUser = usersDB.find(u => u.phone === phone);
-
-            if (!existingUser) return alert("الرقم غير مسجل على هذا الجهاز. يرجى إنشاء حساب.");
+            if (!existingUser) return alert("الرقم غير مسجل. أنشئ حساباً أولاً.");
             if (existingUser.password !== password) return alert("كلمة المرور غير صحيحة.");
 
             currentUser = existingUser;
-            saveSession(rememberMe);
-            checkAuth();
+            saveSession(rememberMe); checkAuth();
         }
 
         function saveSession(remember) {
-            if (remember) {
-                localStorage.setItem('inventory_current_user', JSON.stringify(currentUser));
-                sessionStorage.removeItem('inventory_current_user');
-            } else {
-                sessionStorage.setItem('inventory_current_user', JSON.stringify(currentUser));
-                localStorage.removeItem('inventory_current_user');
-            }
+            if (remember) { localStorage.setItem('inventory_current_user', JSON.stringify(currentUser)); sessionStorage.removeItem('inventory_current_user'); } 
+            else { sessionStorage.setItem('inventory_current_user', JSON.stringify(currentUser)); localStorage.removeItem('inventory_current_user'); }
         }
 
         function logout() {
-            currentUser = null;
-            localStorage.removeItem('inventory_current_user');
-            sessionStorage.removeItem('inventory_current_user');
-            document.getElementById('loginPassword').value = '';
-            checkAuth();
+            currentUser = null; localStorage.removeItem('inventory_current_user'); sessionStorage.removeItem('inventory_current_user');
+            document.getElementById('loginPassword').value = ''; checkAuth();
         }
 
-        // --- دوال التطبيق ---
+        // --- App Logic ---
         function autoSaveSession() {
             if (!currentSession) return;
             const existingIndex = sessionsDB.findIndex(s => s.id === currentSession.id);
@@ -426,12 +382,8 @@
             ['importTab', 'inventoryTab', 'reportsTab'].forEach(id => {
                 const btn = document.getElementById(`btn-${id}`);
                 if (btn) {
-                    btn.classList.remove('border-white', 'text-white');
-                    btn.classList.add('text-blue-200', 'border-transparent');
-                    if (id === tabId) {
-                        btn.classList.remove('text-blue-200', 'border-transparent');
-                        btn.classList.add('border-white', 'text-white');
-                    }
+                    btn.classList.remove('border-white', 'text-white'); btn.classList.add('text-blue-200', 'border-transparent');
+                    if (id === tabId) { btn.classList.remove('text-blue-200', 'border-transparent'); btn.classList.add('border-white', 'text-white'); }
                 }
             });
             if (tabId === 'importTab') loadBrandsForDelete();
@@ -444,17 +396,14 @@
             loadBrandsForDelete();
         }
 
-        function importExcel() {
-            const fileInput = document.getElementById('excelFileInput');
-            if (!fileInput.files.length) return alert("يرجى اختيار ملف إكسيل أولاً");
+        function processExcelFile(file) {
             const reader = new FileReader();
             reader.onload = function (e) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
                 const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                 if (json.length === 0) return alert("الملف فارغ!");
-                let newItems = [];
-                let importedBrands = new Set();
+                let newItems = []; let importedBrands = new Set();
                 json.forEach(row => {
                     let code = row['كود الصنف'] || row['الكود'] || row['Code'];
                     let name = row['اسم الصنف'] || row['الصنف'] || row['Name'];
@@ -471,21 +420,46 @@
                 itemsDB = itemsDB.concat(newItems);
                 localStorage.setItem('inventory_items', JSON.stringify(itemsDB));
                 alert(`تم بنجاح!\nتحديث ${importedBrands.size} ماركة بإجمالي ${newItems.length} صنف.`);
-                fileInput.value = ''; updateDashboard();
+                const fileInput = document.getElementById('excelFileInput');
+                if (fileInput) fileInput.value = ''; 
+                updateDashboard();
             };
-            reader.readAsArrayBuffer(fileInput.files[0]);
+            reader.readAsArrayBuffer(file);
+        }
+
+        function importExcel() {
+            const fileInput = document.getElementById('excelFileInput');
+            if (!fileInput.files.length) return alert("يرجى اختيار ملف إكسيل أولاً");
+            processExcelFile(fileInput.files[0]);
+        }
+
+        async function checkSharedFile() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('shared') === '1') {
+                try {
+                    const cache = await caches.open('inventory-app-v4'); 
+                    const response = await cache.match('/shared-excel-file');
+                    if (response) {
+                        const blob = await response.blob();
+                        const file = new File([blob], "shared-file.xlsx", { type: blob.type });
+                        await cache.delete('/shared-excel-file');
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        if (confirm("تم استلام شيت إكسيل جديد عبر المشاركة. هل تريد استيراده الآن لتحديث بيانات الجرد؟")) {
+                            switchTab('importTab');
+                            processExcelFile(file);
+                        }
+                    }
+                } catch(e) { console.log("خطأ في قراءة الملف المشترك:", e); }
+            }
         }
 
         function clearAllData() {
             if (confirm("هل أنت متأكد من مسح كافة البيانات والجلسات من هذا الجهاز بشكل نهائي؟")) {
-                localStorage.removeItem('inventory_items');
-                localStorage.removeItem('inventory_sessions');
-                itemsDB = []; sessionsDB = [];
-                updateDashboard(); alert("تم تصفير بيانات الجرد.");
+                localStorage.removeItem('inventory_items'); localStorage.removeItem('inventory_sessions');
+                itemsDB = []; sessionsDB = []; updateDashboard(); alert("تم التصفير.");
             }
         }
 
-        // --- دالة حذف ماركة محددة ---
         function loadBrandsForDelete() {
             const brands = [...new Set(itemsDB.map(item => item.brand))];
             const select = document.getElementById('deleteBrandSelect');
@@ -498,16 +472,12 @@
         function deleteBrandData() {
             const brand = document.getElementById('deleteBrandSelect').value;
             if (!brand) return alert("يرجى اختيار ماركة لحذفها.");
-
             if (confirm(`هل أنت متأكد من حذف جميع أصناف وجلسات جرد ماركة (${brand})؟`)) {
                 itemsDB = itemsDB.filter(item => item.brand !== brand);
                 localStorage.setItem('inventory_items', JSON.stringify(itemsDB));
-
                 sessionsDB = sessionsDB.filter(session => session.brand !== brand);
                 localStorage.setItem('inventory_sessions', JSON.stringify(sessionsDB));
-
-                updateDashboard();
-                alert(`تم حذف بيانات ماركة ${brand} بنجاح.`);
+                updateDashboard(); alert(`تم حذف بيانات ماركة ${brand} بنجاح.`);
             }
         }
 
@@ -539,50 +509,36 @@
         function updateProgress() {
             if (!currentSession) return;
             const recordsArray = Object.values(currentSession.records);
-            const total = recordsArray.length;
-            const counted = recordsArray.filter(r => r.isCounted).length;
-            const remaining = total - counted;
-            document.getElementById('progTotal').innerText = total;
-            document.getElementById('progCounted').innerText = counted;
-            document.getElementById('progRemaining').innerText = remaining;
+            document.getElementById('progTotal').innerText = recordsArray.length;
+            document.getElementById('progCounted').innerText = recordsArray.filter(r => r.isCounted).length;
+            document.getElementById('progRemaining').innerText = recordsArray.length - recordsArray.filter(r => r.isCounted).length;
         }
 
         function renderInventoryItems() {
             if (!currentSession) return;
             const searchTxt = document.getElementById('searchInput').value.toLowerCase();
             const listContainer = document.getElementById('itemsList');
-            listContainer.innerHTML = '';
-            const itemsToRender = Object.keys(currentSession.records).map(code => ({ code: code, ...currentSession.records[code] })).filter(item => item.code.toLowerCase().includes(searchTxt) || item.name.toLowerCase().includes(searchTxt));
-            itemsToRender.forEach(item => {
+            listContainer.innerHTML = Object.keys(currentSession.records).map(code => ({ code: code, ...currentSession.records[code] })).filter(item => item.code.toLowerCase().includes(searchTxt) || item.name.toLowerCase().includes(searchTxt)).map(item => {
                 const diff = item.actualQty - item.bookQty;
                 let diffColor = diff === 0 ? 'text-gray-500' : (diff > 0 ? 'text-green-600' : 'text-red-600');
-                let cardBg = item.isCounted ? 'bg-green-50' : 'bg-white';
-                const card = document.createElement('div');
-                card.className = `${cardBg} p-4 rounded-xl shadow-sm border border-gray-200 relative transition-colors duration-300`;
-                card.innerHTML = `
+                return `<div class="${item.isCounted ? 'bg-green-50' : 'bg-white'} p-4 rounded-xl shadow-sm border border-gray-200 relative transition-colors duration-300">
                     <div class="mb-2"><span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">كود: ${item.code}</span><h4 class="font-bold text-gray-800 mt-1 leading-tight">${item.name}</h4></div>
                     <div class="grid grid-cols-2 gap-3 mt-3">
                         <div><label class="block text-xs text-gray-500 mb-1">دفتري</label><input type="number" onchange="updateRecord('${item.code}', 'bookQty', this.value)" value="${item.bookQty}" class="w-full bg-white border border-gray-300 rounded p-2 text-center font-bold focus:border-blue-500 outline-none"></div>
                         <div><label class="block text-xs text-gray-500 mb-1">فعلي (الحالي: ${item.actualQty})</label>
-                            <div class="flex"><input type="number" onchange="updateRecord('${item.code}', 'actualQty', this.value)" value="${item.actualQty}" id="actual_${item.code}" class="w-full bg-white border border-blue-300 rounded-r p-2 text-center font-bold text-blue-700 outline-none">
-                                <button onclick="openCalc('${item.code}')" class="bg-blue-600 text-white px-3 rounded-l font-bold flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></button>
-                            </div>
+                            <div class="flex"><input type="number" onchange="updateRecord('${item.code}', 'actualQty', this.value)" value="${item.actualQty}" id="actual_${item.code}" class="w-full bg-white border border-blue-300 rounded-r p-2 text-center font-bold text-blue-700 outline-none"><button onclick="openCalc('${item.code}')" class="bg-blue-600 text-white px-3 rounded-l font-bold flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></button></div>
                         </div>
                     </div>
                     <div class="mt-2 flex justify-between items-center"><span class="text-xs font-bold ${item.isCounted ? 'text-green-600' : 'text-gray-400'}">${item.isCounted ? '✓ تم الجرد' : 'لم يتم الجرد'}</span><div class="text-sm font-bold ${diffColor}">الفرق: <span id="diff_${item.code}">${diff > 0 ? '+' : ''}${diff}</span></div></div>
-                `;
-                listContainer.appendChild(card);
-            });
+                </div>`;
+            }).join('');
         }
 
         function updateRecord(code, field, value) {
-            let val = parseFloat(value) || 0;
-            currentSession.records[code][field] = val;
+            currentSession.records[code][field] = parseFloat(value) || 0;
             currentSession.records[code].isCounted = true;
             updateProgress(); autoSaveSession();
-            let book = currentSession.records[code].bookQty;
-            let actual = currentSession.records[code].actualQty;
-            let diff = actual - book;
+            let diff = currentSession.records[code].actualQty - currentSession.records[code].bookQty;
             let diffEl = document.getElementById(`diff_${code}`);
             if (diffEl) {
                 diffEl.innerText = diff > 0 ? `+${diff}` : diff;
@@ -598,37 +554,23 @@
             switchTab('reportsTab');
         }
 
-        function openCalc(itemCode) {
-            calcTargetItemCode = itemCode;
-            calcCurrentValue = currentSession.records[itemCode].actualQty;
-            document.getElementById('calcCurrentActual').innerText = calcCurrentValue;
-            document.getElementById('calcDisplay').value = '';
-            document.getElementById('calcModal').classList.remove('hidden');
-        }
+        function openCalc(itemCode) { calcTargetItemCode = itemCode; calcCurrentValue = currentSession.records[itemCode].actualQty; document.getElementById('calcCurrentActual').innerText = calcCurrentValue; document.getElementById('calcDisplay').value = ''; document.getElementById('calcModal').classList.remove('hidden'); }
         function closeCalc() { document.getElementById('calcModal').classList.add('hidden'); }
         function calcPress(val) { let display = document.getElementById('calcDisplay'); if (val === 'C') display.value = ''; else display.value += val; }
         function calcBackspace() { let display = document.getElementById('calcDisplay'); display.value = display.value.slice(0, -1); }
         function calcCalculate() { let display = document.getElementById('calcDisplay'); try { let result = eval(display.value); if (result !== undefined) display.value = result; } catch (e) { display.value = 'خطأ'; } }
         function addResultToActual() {
             calcCalculate();
-            let addedValue = parseFloat(document.getElementById('calcDisplay').value) || 0;
-            let newActual = calcCurrentValue + addedValue;
-            updateRecord(calcTargetItemCode, 'actualQty', newActual);
+            updateRecord(calcTargetItemCode, 'actualQty', calcCurrentValue + (parseFloat(document.getElementById('calcDisplay').value) || 0));
             let inputEl = document.getElementById(`actual_${calcTargetItemCode}`);
-            if (inputEl) inputEl.value = newActual;
+            if (inputEl) inputEl.value = currentSession.records[calcTargetItemCode].actualQty;
             closeCalc();
         }
 
         function loadSessionsForReport() {
             const select = document.getElementById('reportSessionSelect');
             select.innerHTML = '<option value="">اختر جلسة الجرد لعرضها...</option>';
-            [...sessionsDB].reverse().forEach(session => {
-                let opt = document.createElement('option');
-                opt.value = session.id;
-                let dateStr = new Date(session.id).toLocaleString('ar-EG', { hour12: true, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
-                opt.textContent = `${session.brand} - ${session.date} (${dateStr})`;
-                select.appendChild(opt);
-            });
+            [...sessionsDB].reverse().forEach(s => { select.appendChild(new Option(`${s.brand} - ${s.date}`, s.id)); });
             document.getElementById('reportContainer').classList.add('hidden');
             document.getElementById('reportSearchInput').value = '';
             document.getElementById('reportFilterStatus').value = 'all';
@@ -636,53 +578,42 @@
 
         function renderReport() {
             const sessionId = document.getElementById('reportSessionSelect').value;
-            if (!sessionId) { document.getElementById('reportContainer').classList.add('hidden'); return; }
+            if (!sessionId) return document.getElementById('reportContainer').classList.add('hidden');
             const session = sessionsDB.find(s => s.id == sessionId);
             if (!session) return;
             document.getElementById('reportContainer').classList.remove('hidden');
+            
             const searchTxt = document.getElementById('reportSearchInput').value.toLowerCase();
             const filterStatus = document.getElementById('reportFilterStatus').value;
-            const tbody = document.getElementById('reportTableBody');
-            tbody.innerHTML = '';
+            
             let totalBook = 0, totalActual = 0;
-            const filteredCodes = Object.keys(session.records).filter(code => {
+            document.getElementById('reportTableBody').innerHTML = Object.keys(session.records).filter(code => {
                 const rec = session.records[code];
                 const matchesSearch = code.toLowerCase().includes(searchTxt) || rec.name.toLowerCase().includes(searchTxt);
                 let diff = rec.actualQty - rec.bookQty;
-                let matchesFilter = true;
-                if (filterStatus === 'matched') matchesFilter = diff === 0;
-                if (filterStatus === 'deficit') matchesFilter = diff < 0;
-                if (filterStatus === 'surplus') matchesFilter = diff > 0;
-                return matchesSearch && matchesFilter;
-            });
-            filteredCodes.forEach(code => {
-                let rec = session.records[code];
+                if (filterStatus === 'matched' && diff !== 0) return false;
+                if (filterStatus === 'deficit' && diff >= 0) return false;
+                if (filterStatus === 'surplus' && diff <= 0) return false;
+                return matchesSearch;
+            }).map(code => {
+                const rec = session.records[code];
                 totalBook += rec.bookQty; totalActual += rec.actualQty;
                 let diff = rec.actualQty - rec.bookQty;
-                let tr = document.createElement('tr');
-                tr.className = "border-b hover:bg-gray-50";
-                tr.innerHTML = `
-                    <td class="p-2 font-mono text-xs">${code}</td>
-                    <td class="p-2 text-xs truncate max-w-[120px]">${rec.name}</td>
-                    <td class="p-2 text-center text-gray-600">${rec.bookQty}</td>
-                    <td class="p-2 text-center font-bold text-blue-600">${rec.actualQty}</td>
-                    <td class="p-2 text-center font-bold ${diff > 0 ? 'text-green-600' : (diff < 0 ? 'text-red-600' : 'text-gray-400')}" dir="ltr">${diff}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+                return `<tr class="border-b hover:bg-gray-50"><td class="p-2 font-mono text-xs">${code}</td><td class="p-2 text-xs truncate max-w-[120px]">${rec.name}</td><td class="p-2 text-center text-gray-600">${rec.bookQty}</td><td class="p-2 text-center font-bold text-blue-600">${rec.actualQty}</td><td class="p-2 text-center font-bold ${diff > 0 ? 'text-green-600' : (diff < 0 ? 'text-red-600' : 'text-gray-400')}" dir="ltr">${diff}</td></tr>`;
+            }).join('');
+
             document.getElementById('repBook').innerText = totalBook;
             document.getElementById('repActual').innerText = totalActual;
             let totalDiff = totalActual - totalBook;
-            let diffEl = document.getElementById('repDiff');
-            diffEl.innerText = totalDiff;
-            diffEl.className = `font-bold text-lg ${totalDiff > 0 ? 'text-green-700' : (totalDiff < 0 ? 'text-red-700' : 'text-gray-700')}`;
+            document.getElementById('repDiff').innerText = totalDiff;
+            document.getElementById('repDiff').className = `font-bold text-lg ${totalDiff > 0 ? 'text-green-700' : (totalDiff < 0 ? 'text-red-700' : 'text-gray-700')}`;
         }
 
         function resumeInventorySession() {
             const sessionId = document.getElementById('reportSessionSelect').value;
             if (!sessionId) return;
-            const sessionToResume = sessionsDB.find(s => s.id == sessionId);
-            if (sessionToResume) { currentSession = sessionToResume; switchTab('inventoryTab'); openWorkspace(); }
+            currentSession = sessionsDB.find(s => s.id == sessionId);
+            if (currentSession) { switchTab('inventoryTab'); openWorkspace(); }
         }
 
         function exportToExcel() {
@@ -694,10 +625,7 @@
                 let rec = session.records[code];
                 excelData.push([code, rec.name, session.brand, rec.bookQty, rec.actualQty, rec.actualQty - rec.bookQty, rec.isCounted ? 'تم الجرد' : 'لم يتم الجرد']);
             });
-            const ws = XLSX.utils.aoa_to_sheet(excelData);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "تقرير الجرد");
-            XLSX.writeFile(wb, `جرد_${session.brand}_${session.date}.xlsx`);
+            XLSX.writeFile(XLSX.utils.book_append_sheet(XLSX.utils.book_new(), XLSX.utils.aoa_to_sheet(excelData), "تقرير الجرد"), `جرد_${session.brand}_${session.date}.xlsx`);
         }
     </script>
 </body>
