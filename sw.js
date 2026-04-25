@@ -1,6 +1,6 @@
 // قم بتغيير رقم الإصدار هنا (مثلاً v2 إلى v3) كلما قمت بتعديل كود HTML ورفعه على جيت هاب
 // هذا يجبر متصفحات المستخدمين على تحديث التطبيق لديهم
-const CACHE_NAME = 'inventory-app-v2'; 
+const CACHE_NAME = 'inventory-app-v3'; 
 
 const urlsToCache = [
     './',
