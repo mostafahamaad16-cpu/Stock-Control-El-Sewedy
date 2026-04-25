@@ -510,7 +510,8 @@
             document.getElementById('inventorySetup').classList.add('hidden');
             document.getElementById('inventoryWorkspace').classList.remove('hidden');
             document.getElementById('searchInput').value = '';
-            updateProgress(); renderInventoryItems();
+            updateProgress(); 
+            buildInventoryDOM(); // هنا التعديل: نرسم الكروت مرة واحدة فقط
         }
 
         function updateProgress() {
@@ -521,14 +522,17 @@
             document.getElementById('progRemaining').innerText = recordsArray.length - recordsArray.filter(r => r.isCounted).length;
         }
 
-        function renderInventoryItems() {
+        // دالة جديدة تبني الشاشة مرة واحدة 
+        function buildInventoryDOM() {
             if (!currentSession) return;
-            const searchTxt = document.getElementById('searchInput').value.toLowerCase();
             const listContainer = document.getElementById('itemsList');
-            listContainer.innerHTML = Object.keys(currentSession.records).map(code => ({ code: code, ...currentSession.records[code] })).filter(item => item.code.toLowerCase().includes(searchTxt) || item.name.toLowerCase().includes(searchTxt)).map(item => {
+            
+            listContainer.innerHTML = Object.keys(currentSession.records).map(code => {
+                const item = { code: code, ...currentSession.records[code] };
                 const diff = item.actualQty - item.bookQty;
                 let diffColor = diff === 0 ? 'text-gray-500' : (diff > 0 ? 'text-green-600' : 'text-red-600');
-                return `<div class="${item.isCounted ? 'bg-green-50' : 'bg-white'} p-4 rounded-xl shadow-sm border border-gray-200 relative transition-colors duration-300">
+                
+                return `<div id="card_${item.code}" class="inventory-card ${item.isCounted ? 'bg-green-50' : 'bg-white'} p-4 rounded-xl shadow-sm border border-gray-200 relative transition-colors duration-300" data-search="${item.code.toLowerCase()} ${item.name.toLowerCase()}">
                     <div class="mb-2"><span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded">كود: ${item.code}</span><h4 class="font-bold text-gray-800 mt-1 leading-tight">${item.name}</h4></div>
                     <div class="grid grid-cols-2 gap-3 mt-3">
                         <div><label class="block text-xs text-gray-500 mb-1">دفتري</label><input type="number" onchange="updateRecord('${item.code}', 'bookQty', this.value)" value="${item.bookQty}" class="w-full bg-white border border-gray-300 rounded p-2 text-center font-bold focus:border-blue-500 outline-none"></div>
@@ -536,21 +540,44 @@
                             <div class="flex"><input type="number" onchange="updateRecord('${item.code}', 'actualQty', this.value)" value="${item.actualQty}" id="actual_${item.code}" class="w-full bg-white border border-blue-300 rounded-r p-2 text-center font-bold text-blue-700 outline-none"><button onclick="openCalc('${item.code}')" class="bg-blue-600 text-white px-3 rounded-l font-bold flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></button></div>
                         </div>
                     </div>
-                    <div class="mt-2 flex justify-between items-center"><span class="text-xs font-bold ${item.isCounted ? 'text-green-600' : 'text-gray-400'}">${item.isCounted ? '✓ تم الجرد' : 'لم يتم الجرد'}</span><div class="text-sm font-bold ${diffColor}">الفرق: <span id="diff_${item.code}">${diff > 0 ? '+' : ''}${diff}</span></div></div>
+                    <div class="mt-2 flex justify-between items-center"><span id="status_${item.code}" class="text-xs font-bold ${item.isCounted ? 'text-green-600' : 'text-gray-400'}">${item.isCounted ? '✓ تم الجرد' : 'لم يتم الجرد'}</span><div class="text-sm font-bold ${diffColor}">الفرق: <span id="diff_${item.code}">${diff > 0 ? '+' : ''}${diff}</span></div></div>
                 </div>`;
             }).join('');
         }
 
+        // دالة بحث سريعة جداً (تخفي وتظهر الكروت فقط)
+        function filterInventoryItems() {
+            const searchTxt = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.inventory-card');
+            
+            cards.forEach(card => {
+                const searchData = card.getAttribute('data-search');
+                if (searchData.includes(searchTxt)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // تحديث الكارت السريع بدون التأثير على الشاشة
         function updateRecord(code, field, value) {
             currentSession.records[code][field] = parseFloat(value) || 0;
             currentSession.records[code].isCounted = true;
             updateProgress(); autoSaveSession();
+            
             let diff = currentSession.records[code].actualQty - currentSession.records[code].bookQty;
             let diffEl = document.getElementById(`diff_${code}`);
             if (diffEl) {
                 diffEl.innerText = diff > 0 ? `+${diff}` : diff;
                 diffEl.className = diff === 0 ? 'text-gray-500' : (diff > 0 ? 'text-green-600' : 'text-red-600');
-                renderInventoryItems();
+                
+                // تلوين الكارت بلون أخضر وتحديث الحالة دون إعادة رسم الشاشة
+                const card = document.getElementById(`card_${code}`);
+                if(card) { card.classList.remove('bg-white'); card.classList.add('bg-green-50'); }
+                
+                const statusEl = document.getElementById(`status_${code}`);
+                if(statusEl) { statusEl.innerText = '✓ تم الجرد'; statusEl.classList.remove('text-gray-400'); statusEl.classList.add('text-green-600'); }
             }
         }
 
