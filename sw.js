@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inventory-app-v4'; 
+const CACHE_NAME = 'inventory-app-v6'; 
 
 const urlsToCache = [
     './',
@@ -28,27 +28,27 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-    // التقاط الشيت المرسل عبر المشاركة (Share Target)
-    if (event.request.method === 'POST' && event.request.url.includes('/share-target/')) {
+    // التقاط الشيت المرسل عبر المشاركة 
+    if (event.request.method === 'POST' && event.request.url.includes('share-target')) {
         event.respondWith((async () => {
             try {
                 const formData = await event.request.formData();
                 const file = formData.get('sharedFile');
                 if (file) {
-                    // حفظ الشيت مؤقتاً في الكاش
                     const cache = await caches.open(CACHE_NAME);
-                    await cache.put('/shared-excel-file', new Response(file));
+                    // حفظ الملف باسم نسبي بدون /
+                    await cache.put('shared-excel-file', new Response(file));
                 }
-                // فتح التطبيق وإخباره بوجود شيت جديد
-                return Response.redirect('/?shared=1', 303);
+                // التوجيه النسبي للمجلد الحالي (هذا هو السطر الذي يحل مشكلة جيت هاب)
+                return Response.redirect('./?shared=1', 303);
             } catch (err) {
-                return Response.redirect('/', 303);
+                return Response.redirect('./', 303);
             }
         })());
         return;
     }
 
-    // الكود العادي لتشغيل التطبيق أوفلاين (Network First)
+    // الكود العادي لتشغيل التطبيق أوفلاين
     if (!event.request.url.startsWith('http')) return;
     event.respondWith(
         fetch(event.request).then(response => {
