@@ -267,7 +267,8 @@
     <div id="printArea" class="hidden" dir="rtl">
         <div class="flex justify-between items-center border-b-4 border-blue-800 pb-4 mb-6">
             <div class="flex items-center gap-4">
-                <img src="sewedy-logo.png" alt="Logo" class="w-16 h-16 object-contain" onerror="this.style.display='none'">
+                <!-- إضافة ?v=2 هنا هي خدعة مسح الكاش الصوري -->
+                <img src="sewedy-logo.png?v=2" alt="Logo" class="w-16 h-16 object-contain" onerror="this.style.display='none'">
                 <div>
                     <h1 class="text-2xl font-bold text-blue-800">السويدي للأدوات والكابلات الكهربائية</h1>
                     <p class="text-gray-600 font-bold text-lg">تقرير جرد فعلي للمخازن</p>
@@ -797,8 +798,20 @@
             const session = sessionsDB.find(s => s.id == sessionId);
             if (!session) return;
             
+            const searchTxt = document.getElementById('reportSearchInput').value.toLowerCase();
+            const filterStatus = document.getElementById('reportFilterStatus').value;
+
             let excelData = [['كود الصنف', 'اسم الصنف', 'الماركة', 'رصيد دفتري', 'رصيد فعلي', 'الفرق', 'حالة الجرد', 'ملاحظات']];
-            Object.keys(session.records).forEach(code => {
+            
+            Object.keys(session.records).filter(code => {
+                const rec = session.records[code];
+                const matchesSearch = code.toLowerCase().includes(searchTxt) || rec.name.toLowerCase().includes(searchTxt);
+                let diff = rec.actualQty - rec.bookQty;
+                if (filterStatus === 'matched' && diff !== 0) return false;
+                if (filterStatus === 'deficit' && diff >= 0) return false;
+                if (filterStatus === 'surplus' && diff <= 0) return false;
+                return matchesSearch;
+            }).forEach(code => {
                 let rec = session.records[code];
                 excelData.push([code, rec.name, session.brand, rec.bookQty, rec.actualQty, rec.actualQty - rec.bookQty, rec.isCounted ? 'تم الجرد' : 'لم يتم الجرد', rec.note || '']);
             });
@@ -816,7 +829,6 @@
             
             document.getElementById('printDate').innerText = session.date;
             
-            // تحديد يوم الأسبوع بالعربي
             const d = new Date(session.date);
             const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             document.getElementById('printDay').innerText = isNaN(d.getDay()) ? '-' : days[d.getDay()];
@@ -826,9 +838,21 @@
             document.getElementById('printKeeper').innerText = session.storeKeeper || 'غير مسجل';
             document.getElementById('printCounter').innerText = session.userName || 'غير مسجل';
             
+            const searchTxt = document.getElementById('reportSearchInput').value.toLowerCase();
+            const filterStatus = document.getElementById('reportFilterStatus').value;
+            
             let tbody = '';
             let counter = 1;
-            Object.keys(session.records).forEach(code => {
+            
+            Object.keys(session.records).filter(code => {
+                const rec = session.records[code];
+                const matchesSearch = code.toLowerCase().includes(searchTxt) || rec.name.toLowerCase().includes(searchTxt);
+                let diff = rec.actualQty - rec.bookQty;
+                if (filterStatus === 'matched' && diff !== 0) return false;
+                if (filterStatus === 'deficit' && diff >= 0) return false;
+                if (filterStatus === 'surplus' && diff <= 0) return false;
+                return matchesSearch;
+            }).forEach(code => {
                 let rec = session.records[code];
                 let diff = rec.actualQty - rec.bookQty;
                 let diffStr = diff > 0 ? `+${diff}` : diff;
@@ -843,8 +867,8 @@
                     <td class="border border-gray-400 p-1 text-right text-xs text-gray-700">${rec.note || ''}</td>
                 </tr>`;
             });
-            document.getElementById('printTableBody').innerHTML = tbody;
             
+            document.getElementById('printTableBody').innerHTML = tbody;
             window.print();
         }
 
