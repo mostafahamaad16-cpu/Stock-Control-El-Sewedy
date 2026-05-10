@@ -1,4 +1,4 @@
-const CACHE_NAME = 'inventory-app-v13'; 
+const CACHE_NAME = 'inventory-app-v14'; 
 const SHARED_CACHE = 'shared-file-cache'; // صندوق مخصص وثابت للملفات المشتركة
 
 const urlsToCache = [
